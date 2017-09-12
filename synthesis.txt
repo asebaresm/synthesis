@@ -1,0 +1,1065 @@
+==========================================================================================
+INDEX ------------------------------------------------------------------------------------
+==========================================================================================
+1 ... useful commands
+2 ... code/scripting snippets
+3 ... learning/about
+		3.1 ... Redes I
+		3.2 ... Python
+		3.3 ... Server tests/cybersec
+		3.4 ... Linux
+4 ... git
+5 ... streisand
+6 ... misc
+
+
+==========================================================================================
+(1) ... COMMANDS -------------------------------------------------------------------------
+==========================================================================================
+
+#list installed packages:
+dpkg --list
+
+#uninstall package and its config files:
+sudo apt-get --purge remove <package name>
+
+#open with sublime:
+subl <file name>
+
+#making sublime the default editor:
+http://askubuntu.com/questions/396938/how-do-i-make-sublime-text-3-the-default-text-editor
+
+#access to ddclient config file
+sudo subl /etc/ddclient/ddclient.conf
+
+#running ddclient (as a daemon):
+ddclient -daemon=0 -debug -verbose -noquiet
+
+#setting up test php page and deleting it:
+{
+sudo subl /var/www/html/info.php
+
+"<?php
+phpinfo();"
+
+http://your_server_IP_address/info.php
+
+sudo rm /var/www/html/info.php
+}
+
+#start/stop/restart apache2 (always after changing conf pages)
+sudo service apache2 [start | stop | restart]
+
+
+#start/stop ddclient
+sudo /etc/init.d/ddclient start
+sudo /etc/init.d/ddclient stop
+
+#check that ddclient is running
+{
+ps aux | grep ddclient
+output:
+root     28406  0.0  0.2  46996 10184 ?        S    06:36   0:00 ddclient - sleeping for 300 seconds
+arave    28425  0.0  0.0  21712  1088 pts/1    S+   06:36   0:00 grep --color=auto ddclient
+}
+
+#managing SSH keys
+https://www.digitalocean.com/community/tutorials/how-to-configure-ssh-key-based-authentication-on-a-linux-server
+
+
+#Why is it bad to login as root
+http://askubuntu.com/questions/16178/why-is-it-bad-to-login-as-root
+
+#copying files
+sudo cp <path_to_original_file> <path_to_destination_file>
+sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+
+#start/stop fail2ban
+sudo service fail2ban [start | stop]
+
+#view the last 100 ssh login attempts
+tail -100 /var/log/auth.log | grep 'sshd'
+
+#using Dropbox CLI "Dropbox Uploader" client:
+{
+To list all contents in the top-level directory:
+$ ./dropbox_uploader.sh list
+
+To list all contents in a specific folder:
+$ ./dropbox_uploader.sh list Documents/manuals
+
+To upload a local file to a remote Dropbox folder:
+$ ./dropbox_uploader.sh upload snort.pdf Documents/manuals
+
+To download a remote file from Dropbox to a local file:
+$ ./dropbox_uploader.sh download Documents/manuals/mysql.pdf ./mysql.pdf
+
+To download an entire remote folder from Dropbox to a local folder:
+$ ./dropbox_uploader.sh download Documents/manuals ./manuals
+
+To create a new remote folder on Dropbox:
+$ ./dropbox_uploader.sh mkdir Documents/whitepapers
+
+To delete an entire remote folder (including all its contents) on Dropbox:
+$ ./dropbox_uploader.sh delete Documents/manuals
+}
+
+#enabling/disabling Uncomplicated Firewall (UFW)
+sudo ufw disable
+sudo ufw enable
+
+#managing ufw
+{
+https://www.digitalocean.com/community/tutorials/how-to-setup-a-firewall-with-ufw-on-an-ubuntu-and-debian-cloud-server
+https://www.digitalocean.com/community/tutorials/ufw-essentials-common-firewall-rules-and-commands
+http://askubuntu.com/questions/541675/ufw-is-blocking-all-even-when-i-set-rules-to-allow
+}												
+#browsing a file on shell
+less <file_name>
+
+#verifying permissions of a file
+ls -l <file_name>
+
+#opening an empty file/updating timestamps
+touch <file_name>
+
+#sharing a drive/folder Windows-Linux
+#https://www.linux.com/news/using-samba-share-files-between-linux-and-windows
+#https://help.ubuntu.com/community/How%20to%20Create%20a%20Network%20Share%20Via%20Samba%20Via%20CLI%20(Command-line%20interface/Linux%20Terminal)%20-%20Uncomplicated,%20Simple%20and%20Brief%20Way!
+{
+	#accesing samba conf file:
+	sudo subl /etc/samba/smb.conf
+
+	#after altering coinf file
+	sudo service smbd restart
+
+	#in windows, adding shared folder:
+	\\<machine name>\<shared folder name>
+}
+
+#unmount a drive with conflicts
+"If possible, let's locate/identify the busy the process, kill the process and then unmount the samba share to minimize damage."
+lsof | grep '/dev/sda1' (or whatever the mounted device is to target process)
+pkill target_process (kills busy proc. by name | kill PID | killall target_process)
+umount /dev/sda1 (or whatever the mounted device is)
+
+#quick Samba setup
+# /etc/samba/smb.conf 
+https://help.ubuntu.com/community/How%20to%20Create%20a%20Network%20Share%20Via%20Samba%20Via%20CLI%20(Command-line%20interface/Linux%20Terminal)%20-%20Uncomplicated,%20Simple%20and%20Brief%20Way!
+
+#managing Samba service
+sudo service smbd start
+sudo service smbd stop
+sudo service smbd restart
+
+#symbolic link
+{
+	ln -s path/source/file /path/destination/symbolic/link
+}
+
+#run script in the background
+{
+	chmod +x script.py
+	nohup /path/to/script.py &
+
+	#check process
+	ps ax | grep script.py
+}
+
+#clear "An error has ocurred..." crash reports on start-up
+{
+	sudo rm /var/crash/*
+}
+
+#complete (pretty) list of all HDDs-partitions
+{
+	sudo lsblk -o NAME,FSTYPE,SIZE,MOUNTPOINT,LABEL
+}
+
+#mount/u(n)mount HDD-partition
+{
+	sudo mount /dev/sda1 /media/arave/datosSERVER2
+	sudo umount /dev/sda1
+}
+
+#print a file backwards ("reverse cat")
+{
+	sed '1!G;h;$!d' file
+	tac file
+}
+
+#find out how much memory Linux is using:
+{	
+	cat /proc/meminfo
+}
+
+#print working directory
+{
+	pwd
+}
+
+#see which shell you are using
+{
+	echo $0
+}
+
+#see default shell
+{
+	echo $SHELL
+}
+
+#see pid of current shell
+{
+	echo "$$"
+}
+
+#find process by PID
+{
+	ps -p <PID>
+}
+
+#find the PID of the current instance of shell:
+{
+	echo "$$"
+}
+
+# look for files with an extension “c”, and has the occurrence of the string “apple” in it
+{
+	Find ./ -name “*.c” | xargs grep –i “apple”
+}
+
+#display all .txt files, including its individual permission.
+{ 	
+	ls -a -l *.txt
+}
+
+#easy check free memory
+{
+	free -m
+	free -g
+}
+
+#enable root loging in Ubuntu
+{
+	sudo sh-c ‘echo “greater-show-manual-login=true” >>/etc/lightdm/lightdm.conf’
+}
+
+#find out what version of Linux (distro) you are running
+{
+	cat /etc/*-release
+}
+
+#display the Linux or Unix kernel version
+{
+	uname -r
+
+	#gives 4.10.0-33-generic
+	#4 : Kernel version
+    #10 : The major revision of the kernel
+    #0 : The minor revision of the kernel
+    #33 : Immediate fixing / bug fixing for critical error
+    #generic : Distribution specific sting. For example, Redhat appends string such as EL5 to indicate RHEL 5 kernel.
+}
+{
+	uname -mrsn
+
+	#gives Linux araveSERVER 4.10.0-33-generic x86_64
+}
+
+#details about individual cpu cores
+{
+	cat /proc/cpuinfo
+	less /proc/cpuinfo
+}
+
+# print the cpu hardware details in a user-friendly format
+{
+	lscpu
+}
+
+#general hardware info
+{
+	lshw
+	lshw -class <CLASS>
+}
+
+[GENERAL REFERENCE]
+https://linoxide.com/guide/linux-command-shelf.html
+
+1    System
+2    Hardware
+3    Statistics
+4    Users
+5    File Commands
+6    Process Related
+7    File Permission Related
+8    Network
+9    Compression / Archives
+10   Install Package
+11   Search
+12   Login (ssh and telnet)
+13   File transfer
+14   Disk Usage
+15   Directory Traverse
+
+1. SYSTEM
+    $ uname -a                       => Display linux system information
+
+    $ uname -r                       => Display kernel release information (refer uname command in detail)
+
+    $ cat /etc/redhat_release        => Show which version of redhat installed 
+
+    $ uptime                         => Show how long system running + load (learn uptime command)
+
+    $ hostname                       => Show system host name
+
+    $ hostname -i                    => Display the IP address of the host (all options hostname)
+
+    $ last reboot                    => Show system reboot history (more examples last command)
+
+    $ date                           => Show the current date and time (options of date command)
+
+    $ cal                            => Show this month calendar (what more in cal)
+
+    $ w                              => Display who is online (learn more about w command)
+
+    $ whoami                         => Who you are logged in as (example + sreenshots)
+
+    $ finger user                    => Display information about user (many options of finger command)
+
+2. Hardware
+    $ dmesg                          => Detected hardware and boot messages (dmesg many more options)
+
+    $ cat /proc/cpuinfo              => CPU model
+
+    $ cat /proc/meminfo              => Hardware memory
+
+    $ cat /proc/interrupts           => Lists the number of interrupts per CPU per I/O device
+
+    $ lshw                           => Displays information on hardware configuration of the system
+
+    $ lsblk                          => Displays block device related information in Linux (sudo yum install util-linux-ng)
+
+    $ free -m                        => Used and free memory (-m for MB) (free command in detail)
+
+    $ lspci -tv                      => Show PCI devices (very useful to find vendor ids)
+
+    $ lsusb -tv                      => Show USB devices (read more lsusb options)
+
+    $ lshal                          => Show a list of all devices with their properties 
+
+    $ dmidecode                      => Show hardware info from the BIOS (vendor details)
+
+    $ hdparm -i /dev/sda	          # Show info about disk sda 
+
+    $ hdparm -tT /dev/sda	         # Do a read speed test on disk sda
+
+    $ badblocks -s /dev/sda	         # Test for unreadable blocks on disk sda
+
+
+3. Statistics
+
+    $ top                              => Display and update the top cpu processes (30 example options)
+
+    $ mpstat 1                         => Display processors related statistics (learn mpstat command)
+
+    $ vmstat 2                         => Display virtual memory statistics (very useful performance tool)
+
+    $ iostat 2                         => Display I/O statistics (2sec Intervals) (more examples)
+
+    $ tail -n 500 /var/log/messages    => Last 10 kernel/syslog messages (everyday use tail options)
+
+    $ tcpdump -i eth1                  => Capture all packets flows on interface eth1 (useful to sort network issue)
+
+    $ tcpdump -i eth0 'port 80'        => Monitor all traffic on port 80 ( HTTP )
+
+    $ lsof                             => List all open files belonging to all active processes.(sysadmin favorite command)
+
+    $ lsof -u testuser                 => List files opened by specific user
+
+    $ free -m                          => Show amount of RAM (daily usage command)
+
+    $ watch df -h                      => Watch changeable data continuously(interesting linux command)
+
+
+4. Users
+
+    $ id                                  => Show the active user id with login and group(with screenshot)
+
+    $ last                                => Show last logins on the system (few more examples)
+
+    $ who                                 => Show who is logged on the system(real user who logged in)
+
+    $ groupadd   admin                    => Add group "admin" (force add existing group)
+
+    $ useradd -c  "Sam Tomshi" -g admin -m sam  => Create user "sam" and add to group "admin"(here read all parameter)
+
+    $ userdel sam                         => Delete user sam (force,file removal)
+
+    $ adduser sam                         => Add user "sam" 
+
+    $ usermod                             => Modify user information(mostly useful for linux system admins)
+
+
+5. File Commands
+
+    $ ls -al                                => Display all information about files/ directories(20 examples)
+
+    $ pwd                                   => Show current directory path(simple but need every day)
+
+    $ mkdir directory-name                  => Create a directory(create mutiple directory)
+
+    $ rm file-name                          => Delete file(be careful of using rm command)
+
+    $ rm -r directory-name                  => Delete directory recursively 
+
+    $ rm -f file-name                       => Forcefully  remove file
+
+    $ rm -rf directory-name                 => Forcefully remove directory recursively
+
+    $ cp file1 file2                        => Copy file1 to file2 (15 cd command examples)
+
+    $ cp -r dir1 dir2                       => Copy dir1 to dir2, create dir2 if it doesn't  exist
+
+    $ mv file1 file2                        => Move files from one place to another(with 10 examples)
+
+    $ ln -s  /path/to/file-name  link-name  => Create symbolic link to file-name (examples)
+
+    $ touch file                            => Create or update file (timestamp change)
+
+    $ cat > file                            => Place standard input into file (15 cat command examples)
+
+    $ more file                             => Output the contents of file (help display long tail files)
+
+    $ head file                             => Output the first 10 lines of file (with different parameters)
+
+    $ tail file                             => Output the last 10 lines of file (detailed article with tail options)
+
+    $ tail -f file                          => Output the contents of file as it grows starting with the last 10 lines
+
+    $ gpg -c file                           => Encrypt file (how to use gpg)
+
+    $ gpg file.gpg                          => Decrypt file
+
+
+6. Process Related
+
+    $ ps                               # Display your currently active processes (many parameters to learn)
+
+    $ ps aux | grep 'telnet'           # Find all process id related to telnet process
+
+    $ pmap                             # Memory map of process (kernel,user memory etc)
+
+    $ top                              # Display all running processes (30 examples)
+
+    $ kill pid                         # Kill process with mentioned pid id (types of signals)
+
+    $ killall proc                     # Kill all processes named proc
+
+    $ pkill processname                # Send signal to a process with its name
+
+    $ bg                               # Resumes suspended jobs without bringing them to foreground (bg and fg command)
+
+    $ fg                               # Brings the most recent job to foreground
+
+    $ fg n                             # Brings job n to the foreground
+
+
+7. File Permission Related
+
+    $ chmod octal file-name     # Change the permissions of file to octal , which can be found separately for user, group and world
+    octal value  (more examples)
+
+    4 - read
+    2 - write
+    1 - execute
+    Example 
+
+    $ chmod 777 /data/test.c                   # Set rwx permission for owner , rwx  permission for group, rwx permission for world
+
+    $ chmod 755 /data/test.c                   # Set rwx permission for owner,rx for group and world
+
+    $ chown owner-user file                    # Change owner of the file (chown more examples)
+
+    $ chown owner-user:owner-group  file-name  # Change owner and group owner of the file
+
+    $ chown owner-user:owner-group directory   # Change owner and group owner of the directory
+
+    Example 
+
+    $ chown bobbin:linoxide test.txt
+
+    $ ls -l test.txt
+    -rw-r--r-- 1 bobbin linoxide 0 Mar 04 08:56 test.txt
+
+
+
+8. Network
+
+    $ ifconfig -a                  # Display all network ports and ip address (set mtu and other all options,ifconfig now in deprecated network command)
+
+    $ ifconfig eth0                # Display specific  ethernet port ip address and details
+
+    $ ip addr show                 # Display all network interfaces and ip address(available in iproute2 package,powerful than ifconfig)
+
+    $ ip address add 192.168.0.1 dev eth0      # Set ip address
+
+    $ ethtool eth0                 # Linux tool to show ethernet status (set full duplex , pause parameter)
+
+    $ mii-tool  eth0               # Linux tool to show  ethernet status (more or like ethtool)
+
+    $ ping host                    # Send echo request to test connection (learn sing enhanced ping tool)
+
+    $ whois domain                 # Get who is information for domain
+
+    $ dig domain                   # Get DNS information for domain (screenshots with other available parameters)
+
+    $ dig  -x host                 # Reverse lookup host 
+
+    $ host google.com              # Lookup DNS ip address for the name (8 examples of host command)
+
+    $ hostname -i                  # Lookup local ip address (set hostname too)
+
+    $ wget file                    # Download file (very useful other option)
+
+    $ netstat  -tupl               # Listing all active listening ports(tcp,udp,pid) (13 examples)
+
+
+9. Compression / Archives
+
+    $ tar cf home.tar  home              # Create tar named home.tar containing home/ (11 tar examples)
+
+    $ tar xf file.tar                    # Extract the files from file.tar
+
+    $ tar czf  file.tar.gz  files        # Create a tar with gzip compression
+
+    $ gzip file                          # Compress file and renames it to file.gz 
+
+
+10. Install Package
+
+    $ rpm -i pkgname.rpm                         # Install rpm based package (Installing, Uninstalling, Updating, Querying ,Verifying)
+
+    $ rpm -e pkgname                             # Remove package
+
+    Install from source
+    ./configure
+    make
+    make install
+
+
+11. Search
+
+    $ grep pattern files                 # Search for pattern in files (you will this command often)
+
+    $ grep  -r pattern dir                # Search recursively for pattern in dir
+
+    $ locate file                        # Find all instances of file
+
+    $ find /home/tom -name 'index*'      # Find files names that start with "index"(10 find examples)
+
+    $ find /home -size +10000k           # Find files larger than 10000k in /home
+
+
+12. Login (ssh and telnet)
+
+    $ ssh user@host                         # Connect to host as user (secure data communication command)
+
+    $ ssh  -p port user@host                # Connect to host using specific port
+
+    $ telnet host                           # Connect to the system using  telnet port
+
+
+13. File Transfer
+    scp
+
+    $ scp file.txt   server2:/tmp                   # Secure copy file.txt to remote host  /tmp folder
+
+    $ scp nixsavy@server2:/www/*.html   /www/tmp    # Copy *.html files from remote host to current system /www/tmp folder
+
+    $ scp -r nixsavy@server2:/www   /www/tmp        # Copy all files and folders recursively from remote server to the current system /www/tmp folder
+
+    rsync
+
+    $ rsync -a /home/apps /backup/                  # Synchronize source to destination
+
+    $ rsync -avz /home/apps linoxide@192.168.10.1:/backup    # Synchronize files/directories between the local and remote system with compression enabled
+
+
+14. Disk Usage
+
+    $ df -h                         # Show free space on mounted filesystems(commonly used command)
+
+    $ df -i	                        # Show free inodes on mounted filesystems
+
+    $ fdisk -l	                # Show disks partitions sizes and types(fdisk command output)
+
+    $ du -ah                        # Display disk usage in human readable form (command variations)
+
+    $ du -sh                        # Display total disk usage on the current directory
+
+    $ findmnt                        # Displays target mount point for all filesystem (refer type,list,evaluate output)
+
+    $ mount device-path mount-point  # Mount a device 
+
+
+15. Directory Traverse
+
+    $ cd ..                              # To go up one level of the directory tree(simple & most needed)
+
+    $ cd	                             # Go to $HOME directory
+
+    $ cd /test                           # Change to /test directory
+
+
+==========================================================================================
+(2) ... CODE -----------------------------------------------------------------------------
+==========================================================================================
+[PYTHON - FILE HANDLING]
+thisfile.read() reads entire file into one string
+thisfile.readline() reads one line of a file
+thisfile.readlines() reads entire file into a list of strings, one per line
+for eachline in thisfile: steps through lines in a file
+
+#Sample 1 - elucidating each step but not memory efficient
+lines = []
+with open("C:\name\MyDocuments\numbers") as file:
+    for line in file: 
+        line = line.strip() #or some other preprocessing
+        lines.append(line) #storing everything in memory!
+
+#Sample 2 - a more pythonic and idiomatic way but still not memory efficient
+with open("C:\name\MyDocuments\numbers") as file:
+    lines = [line.strip() for line in file]
+
+#Sample 3 - a more pythonic way with efficient memory usage. Proper usage of with and file iterators. 
+with open("C:\name\MyDocuments\numbers") as file:
+    for line in file:
+        line = line.strip() #preprocess line
+        doSomethingWithThisLine(line) #take action on line instead of storing in a list. more memory efficient at the cost of execution speed.
+
+[C - WRITING TO FILE INPUT SENTENCE]
+
+#include <stdio.h>
+#include <stdlib.h>  /* For exit() function */
+int main()
+{
+   char sentence[1000];
+   FILE *fptr;
+
+   fptr = fopen("program.txt", "w");
+   if(fptr == NULL)
+   {
+      printf("Error!");
+      exit(1);
+   }
+   
+   printf("Enter a sentence:\n");
+   gets(sentence);
+
+   fprintf(fptr,"%s", sentence);
+   fclose(fptr);
+
+   return 0;
+
+[C - READING TEXT FILE, STATIC BUFFER]
+
+#include <stdio.h>
+#define MAXBUFLEN 1000000
+
+char source[MAXBUFLEN + 1];
+FILE *fp = fopen("foo.txt", "r");
+if (fp != NULL) {
+    size_t newLen = fread(source, sizeof(char), MAXBUFLEN, fp);
+    if ( ferror( fp ) != 0 ) {
+        fputs("Error reading file", stderr);
+    } else {
+        source[newLen++] = '\0'; /* Just to be safe. */
+    }
+
+    fclose(fp);
+}
+
+[C - READING TEXT FILE, DYNAMIC BUFFER]
+#include <stdio.h>
+#include <stdlib.h>
+
+char *source = NULL;
+FILE *fp = fopen("foo.txt", "r");
+if (fp != NULL) {
+    /* Go to the end of the file. */
+    if (fseek(fp, 0L, SEEK_END) == 0) {
+        /* Get the size of the file. */
+        long bufsize = ftell(fp);
+        if (bufsize == -1) { 
+            /* Error */ 
+        }
+
+        /* Allocate our buffer to that size. */
+        source = malloc(sizeof(char) * (bufsize + 1));
+
+        /* Go back to the start of the file. */
+        if (fseek(fp, 0L, SEEK_SET) != 0) { /* Error */ }
+
+        /* Read the entire file into memory. */
+        size_t newLen = fread(source, sizeof(char), bufsize, fp);
+        if ( ferror( fp ) != 0 ) {
+            fputs("Error reading file", stderr);
+        } else {
+            source[newLen++] = '\0'; /* Just to be safe. */
+        }
+    }
+    fclose(fp);
+}
+
+free(source); 
+==========================================================================================
+(3) ... LEARNING--------------------------------------------------------------------------
+==========================================================================================
+[REDES I]
+Sobre sockets:
+	https://vcansimplify.wordpress.com/2013/03/14/c-socket-tutorial-echo-server/
+	http://www.binarytides.com/server-client-example-c-sockets-linux/
+	https://www.softlab.ntua.gr/facilities/documentation/unix/unix-socket-faq/unix-socket-faq-2.html
+
+Referencia más general sobre network programming:
+	http://beej.us/guide/bgnet/output/html/multipage/index.html
+
+Sobre librerías estáticas:
+	http://stackoverflow.com/questions/11344547/how-do-i-compile-a-static-library/11345669#11345669
+
+Sobre odxygen:
+	http://fnch.users.sourceforge.net/doxygen_c.html
+	> Y su output: http://fnch.users.sourceforge.net/data/doxygen_c/html/doxygen__c_8h.html
+
+	http://www.stack.nl/~dimitri/doxygen/manual/docblocks.html
+	https://www.cs.cmu.edu/~410/doc/doxygen.html
+
+	http://stackoverflow.com/questions/51667/best-tips-for-documenting-code-using-doxygen/22836702#22836702
+
+Sobre `clock_gettime()`:
+	http://stackoverflow.com/questions/6749621/how-to-create-a-high-resolution-timer-in-linux-to-measure-program-performance
+
+Sobre el manual de linux:
+	http://www.refining-linux.org/archives/18/11-Understanding-Linux-man-pages/
+	
+	"Manual pages on Linux are divided into eight categories:
+
+	1 - User commands that everyone can execute
+	2 - System calls (syscalls) provided by the kernel
+	3 - C library functions
+	4 - Devices and special files (e.g. device files in /dev)
+	5 - File formats and conventions (e.g. syntax of /etc/fstab)
+	6 - Games and other fun stuff
+	7 - Miscellaneous (e.g. macro packages)
+	8 - System administration tools and daemons that only root can execute"
+
+Sobre `errno`:
+	http://beej.us/guide/bgnet/output/html/multipage/errnoman.html
+
+Sobre hilos:
+	https://computing.llnl.gov/tutorials/pthreads/#Thread
+
+	"Context switching between threads is fast as compared to context switching between processes."
+	http://softpixel.com/~cwright/programming/threads/threads.c.php
+
+	"both the original thread and the new thread share the same code base and the same memory – it’s just like 
+	making two function calls at the same time"
+	http://timmurphy.org/2010/05/04/pthreads-in-c-a-minimal-working-example/
+
+	Sobre sincronización de hilos con 'mutex':
+		http://www.thegeekstuff.com/2012/05/c-mutex-examples/
+
+	Sobre qué se comparte entre hilos:
+		http://stackoverflow.com/questions/1665419/do-threads-have-a-distinct-heap
+
+	Sobre pthread_detach:
+		http://stackoverflow.com/questions/6042970/pthread-detach-question/6043018#6043018
+
+	Ejemplo sobre mutex:
+		http://www.thegeekstuff.com/2012/05/c-mutex-examples/
+
+Sobre variables extern y declaracion_vs_definicion:
+	http://stackoverflow.com/questions/1433204/how-do-i-use-extern-to-share-variables-between-source-files-in-c
+
+Sobre CAP:
+	https://github.com/ircv3/ircv3-specifications/blob/master/extensions/sasl-3.2.md
+
+* http://metis.ii.uam.es/redes2/group__IRCMessageOptional.html
+
+[PYTHON]
+Sobre el por qué usar clases abstractas en python:
+	http://stackoverflow.com/questions/3570796/why-use-abstract-base-classes-in-python
+Documentación sobre clases abstractas:
+	http://stackoverflow.com/questions/3570796/why-use-abstract-base-classes-in-python
+Ejemplo práctico clases abstractas:
+	http://zaiste.net/2013/01/abstract_classes_in_python/
+
+Sobre la naturaleza de las variables en Python:
+	http://python.net/~goodger/projects/pycon/2007/idiomatic/handout.html#other-languages-have-variables
+
+Sobre la herencia múltiple en Python con ejemplo (1 clase hereda de 2):
+	http://www.python-course.eu/inheritance_example.php
+
+[SERVER TESTS/CYBERSEC]
+Hacer Apache más robusto 
+	http://www.tecmint.com/apache-security-tips/
+
+Implementar una solución: "File Auditing and Intrusion Detection Systems"
+	https://www.digitalocean.com/community/tutorials/how-to-use-tripwire-to-detect-server-intrusions-on-an-ubuntu-vps
+	ó
+	https://www.digitalocean.com/community/tutorials/how-to-install-aide-on-a-digitalocean-vps
+
+configurar fail2ban, sendmail para recibir notificaciones de intento de login por ssh en el server
+	http://www.linuxquestions.org/questions/linux-server-73/how-to-config-fail2ban-send-email-to-gmail-when-it-ban-ip-4175422187/
+
+iptables, filtrar el tráfico del servidor con iptables
+	https://www.digitalocean.com/community/tutorials/how-to-set-up-a-firewall-using-iptables-on-ubuntu-14-04
+
+fail2ban (avanzado), expandir
+	https://www.digitalocean.com/community/tutorials/how-fail2ban-works-to-protect-services-on-a-linux-server
+
+script que te devuelva la IP actual del servidor/programa/funciones PHP
+	http://php.net/manual/es/function.gethostbyname.php
+
+SOBRE SSH, SSH TUNNEL, etc
+	http://www.howtogeek.com/175446/how-risky-is-it-to-run-a-home-server-secured-behind-ssh/
+	https://www.digitalocean.com/community/tutorials/how-to-configure-ssh-key-based-authentication-on-a-linux-server
+
+Proteger el servidor contra bots de fuerza bruta (fail2ban)
+	https://www.digitalocean.com/community/tutorials/how-to-protect-ssh-with-fail2ban-on-ubuntu-14-04
+
+transferir archivos con el server por SFTP
+	-> fuck SFTP en Windows, require configurar PSFTP/WinSCP. Alternativa que solo requiere un navegador y PuTTy portable:
+	http://xmodulo.com/access-dropbox-command-line-linux.html (pasado a linux_commands_v2).
+
+configurar un firewall del lado del servidor (y así no depender del firewall del router para todo)
+	Recursos dónde leer sobre configuraciones del UFW
+		https://www.digitalocean.com/community/tutorials/how-to-setup-a-firewall-with-ufw-on-an-ubuntu-and-debian-cloud-server
+		https://www.digitalocean.com/community/tutorials/ufw-essentials-common-firewall-rules-and-commands
+		http://askubuntu.com/questions/541675/ufw-is-blocking-all-even-when-i-set-rules-to-allow
+
+tener 2 dominios asociados a la misma IP pero con el apache sirviendoles distintas carpetas (Virtualhost, nameBased)
+	https://httpd.apache.org/docs/current/vhosts/examples.html
+
+resolver el problema de los permisos de apache escritura/lectura
+	http://blog.netgusto.com/solving-web-file-permissions-problem-once-and-for-all/
+
+[LINUX]
+entender bien cómo funcionan los usuarios y los grupos en linux
+	https://www.linode.com/docs/tools-reference/linux-users-and-groups
+
+implementar en server/Dropbox KeePass
+	http://keepass.info/
+
+Sobre terminos Linux:
+	'Kernel' is the core of Linux Operating System
+	'Shell' is a command Line Interpreter
+	'Command' is user Instruction to Computer
+	'Script' is collection of commands stored in a file
+	'Terminal' is a command Line Interface
+	'CLI' is short for Command Line Interface.
+	* A terminal is a program which enables you to access a shell. A shell doesn't need a terminal emulator to run.
+
+
+Difference Between Linux and UNIX:
+	https://www.cyberciti.biz/faq/what-is-the-difference-between-linux-and-unix/
+
+	"Linux is a Unix clone written from scratch by Linus Torvalds with assistance from a loosely-knit team of hackers across the Net. 
+	It aims towards POSIX compliance"
+
+	"Linux is just a kernel. All Linux distributions includes GUI system + GNU utilities (such as cp, mv, ls,date, bash etc) + installation & management tools + GNU c/c++ Compilers + Editors (vi) + and various applications (such as OpenOffice, Firefox). However, most UNIX operating systems are considered as a complete operating system as everything come from a single source or vendor."
+
+about swap partition:
+	"The preferred size for a swap partition is twice the amount of physical memory available on the system.""
+
+What are the contents in /usr/local:
+	"It contains locally installed files. This directory actually matters in environments where files are stored on the network. Specifically, locally-installed files go to /usr/local/bin, /usr/local/lib, etc.). Another application of this directory is that it is used for software packages installed from source, or software not officially shipped with the distribution."
+
+
+==========================================================================================
+(4) ... GIT-------------------------------------------------------------------------------
+==========================================================================================
+#Ver los cambios que has realizado en tu copia local:
+#(NO te mostrará los cambios quehaya hecho yo en la nube)
+git status
+
+#Añadir cambios (si no ha borrado archivos):
+git add .
+
+#Añadir cambios (si has borrado archivos):
+git add . -A
+
+#Commit de cambios:
+git commit -m "mensaje del commit"
+
+#Subir cambios:
+git push origin master
+
+#Descargar versión más actualizada:
+git pull origin master
+
+#si yo he añadido cambios cuando no estabas, te pedirá que:
+#	- hagas un pull
+#	- puedes cambiar el mensaje por dejecto del merge en el editor
+#	- guardar con Ctrl+X
+#	- push de nuevo
+
+#Te pedirá tu mail de la UAM cuando hagas el primer commit en el PC 
+#del lab. Copia el comando tal cual cambiando tu email y au.
+
+#hacer que tu branch local sea un clone del remoto 
+(después de haber descartado cambios):
+git fetch origin
+git reset --hard origin/master
+
+#Si quieres guardar tus cambios locales en remoto antes de hacer lo de arriba:
+git commit -m "Saving my work, just in case"
+git branch my-saved-work
+
+#discard de TODOS los cambios en local (si has estado guarreando y no quieres auto-mergearlo con el pull):
+#PARA: untracked files/unstaged changes
+git clean -df
+git checkout -- .
+
+#Revertir cambios en repo local y dejarlo como el ultimo commit de remoto, BORRANDO LOS ARCHIVOS/CAMBIOS
+git reset --hard
+
+#Ignorar cambios en un archivo local QUE YA ESTÁ EN EL REPO
+#	Some files in a repository change often but are rarely committed. Usually, these are various local
+#	configuration files that are edited, but should never be committed upstream. Git lets you ignore 
+#	those filesby assuming they are unchanged.
+git update-index --assume-unchanged path/to/file.txt
+
+#	To make Git track the file again, simply run:
+git update-index --no-assume-unchanged path/to/file.txt
+
+#Ignorar new untracked file QUE NO ESTABA EN EL REPO
+#	https://git-scm.com/docs/gitignore#_examples
+
+==========================================================================================
+(5) ... STREISAND-------------------------------------------------------------------------
+==========================================================================================
+
+[RECOPILADO]
+> Sobre VPNs en general:
+	- http://gizmodo.com/5990192/vpns-what-they-do-how-they-work-and-why-youre-dumb-for-not-using-one
+
+> VPNs for beginners:
+	https://www.bestvpn.com/blog/38176/vpns-beginners-need-know/
+
+> VPN vs proxy:
+	https://www.howtogeek.com/247190/whats-the-difference-between-a-vpn-and-a-proxy/
+
+> Sobre 'encriptado' y 'cifrado':
+	http://www.brighthub.com/computing/enterprise-security/articles/65254.aspx
+	
+> https://ipleak.net/
+	- https://www.bestvpn.com/blog/31750/a-complete-guide-to-ip-leaks/
+
+> Reforzar aún más la conexión VPN: OpenVPN (direct) vs OpenVPN (stunnel):
+	- https://wiki.ldn-fai.net/wiki/OpenVPN_Server_Tutorial#OpenVPN_and_TLS
+	- https://serverfault.com/questions/675553/stunnel-vpn-traffic-and-ensure-it-looks-like-ssl-traffic-on-port-443
+
+> Best VPN protocol
+	- https://www.howtogeek.com/211329/which-is-the-best-vpn-protocol-pptp-vs.-openvpn-vs.-l2tpipsec-vs.-sstp/
+
+[EXTRA]
+> Script/pagina popular sobre streisand
+	https://jerrygamblin.com/2016/07/10/the-vpn-you-should-be-using/
+
+> Sobre conexion a internet desde guests
+	- https://pubs.vmware.com/workstation-9/index.jsp?topic=%2Fcom.vmware.ws.using.doc%2FGUID-BAFA66C3-81F0-4FCA-84C4-D9F7D258A60A.html
+	- https://enterprise.cloudshark.org/blog/packet-capture-in-vmware-virtual-machine/
+> Weak Diffie-Hellman and the Logjam Attack
+	- https://arstechnica.com/security/2015/10/how-the-nsa-can-break-trillions-of-encrypted-web-and-vpn-connections/
+	- https://weakdh.org/
+	- https://weakdh.org/imperfect-forward-secrecy-ccs15.pdf
+
+> DNS Leak
+	- http://www.makeuseof.com/tag/dns-leaks-can-destroy-anonymity-using-vpn-stop/
+	- https://vpnreviewer.com/dns-leak-fix
+
+
+[POR RECOPILAR]
+> Sobre qué hace y qué NO hace una VPN
+	- REGLA GENERAL: "VPNs provide privacy, not anonymity"
+	- "No matter what they say, no VPN provider staff will go to jail (or ruin their business) to protect a customer. If the data exists, any VPN provider can be compelled to hand it over. Period."
+	- "Choosing a VPN provider therefore comes down to a matter of trust"
+
+> Sobre el contrato que firmas con los "free VPN"
+
+> Maybe?: "VPN through Tor does provide some concrete benefits"
+
+> Spreadsheet con los mejores proveedores de VPNs
+	- Notar: dificultad a la hora de encontrar un buen proveedor por todas las variables que hay que tener en cuenta.
+
+> Claim: "Europe the Netherlands, Luxembourg, Romania, and Sweden are popular places to base a VPN service because VPN providers in these countries are not required to keep logs"
+
+> Países/casos particulares donde:
+	- Los proveedores de VPNs han sido forzados a mantener logs de sus usuarios.
+
+> Usar un proveedor VPN vs desplegar streisand en un BPS
+	- Posible capa de complejidad para entidades reguladoras:
+		¿Qué es una VPN y qué es una VPS? ¿Forzamos a TODOS a mantener logs?
+
+[STREISAND]
+> Servicios:
+	- L2TP/IPsec
+		=> stack: L2TP + IPsec
+		=> facil de implementar, OSs modernos
+		=> UDP 500, no tan facil de coultar como OpenVPn (any port)
+		=> "IPsec encryption should be secure, theoretically."
+		=> "In Summary: L2TP/IPsec is theoretically secure, but there are some concerns. It’s easy to set up, but has trouble getting around firewalls and isn’t as efficient as OpenVPN. Stick with OpenVPN if possible, but definitely use this over PPTP."
+	- OpenConnect
+		=> "OpenConnect is an open-source software application for connecting to virtual private networks (VPN), which implement secure point-to-point connections."
+	- OpenSSH
+		=> OpenBSD Secure Shell
+		=> "is a suite of security-related network-level utilities based on the Secure Shell (SSH) protocol"
+		=> "The OpenSSH suite includes the following command-line utilities and daemons:
+		    - ssh, a replacement for rlogin, rsh and telnet to allow shell access to a remote machine.
+		    - scp, a replacement for rcp
+		    - sftp, a replacement for ftp to copy files between computers
+		    - sshd, the SSH server daemon
+		    - ssh-keygen, a tool to inspect and generate the RSA, DSA and Elliptic Curve keys that are used for user and host authentication
+		    - ssh-agent and ssh-add, utilities to ease authentication by holding keys ready and avoid the need to enter passphrases every time they are used
+		    - ssh-keyscan, which scans a list of hosts and collects their public keys"
+	- OpenVPN
+		=> uses open-source technologies like OpenSSL, SSL v3/TLS v1
+		=> "In Summary: OpenVPN is new and secure, although you will need to install a third-party application. This is the one you should probably use."
+	- Shadowsocks
+	- sslh
+	- Stunnel
+		=> "typical example is to use it to bypass an overly secure firewall: You're on a LAN with no SSH access to the Internet, but the HTTPS protocol (port 443) can get through. Using stunnel it's possible to encapsulate an SSH connection with SSL.""
+	- Tor bridge
+	- WireGuard
+
+
+    L2TP/IPsec
+    OpenConnect / Cisco AnyConnect
+    OpenVPN (direct)
+    OpenVPN (stunnel)
+    Shadowsocks
+    SSH
+    Tor
+    WireGuard
+
+> Ubuntu 16.04.2 LTS reqs:
+	"Recommended system requirements:
+	    2 GHz dual core processor or better
+	    2 GB system memory
+	    25 GB of free hard drive space
+	    Either a DVD drive or a USB port for the installer media
+	    Internet access is helpful"
+
+==========================================================================================
+(6) ... MISC------------------------------------------------------------------------------
+==========================================================================================
+> Server init
+	- synergy
+	- samba
+	- apache
+	- ufw
+	- Deluge
+	- ssh - keys on place
+	- fail2ban
